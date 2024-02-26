@@ -1,42 +1,76 @@
-# Analisis de las Administradoras de Riesgos de Salud ARS en el Seguro Familiar de Salud SFS de la Republica Dominicana
+# Análisis de las Administradoras de Riesgos de Salud (ARS) en el Seguro Familiar de Salud (SFS) de la República Dominicana
 
-Permitir a los usuarios filtrar, ordenar, agrupar y explorar los datos de forma intuitiva.
+**Autor:** Jesús Díaz  
+**Fecha:** 2024-02-26
 
-Objetivo
-Optar por la posición de Analista de Ciencia de Datos en Inteligencia PDSS
+Este proyecto tiene como objetivo realizar un análisis exhaustivo de las Administradoras de Riesgos de Salud (ARS) en el marco del Seguro Familiar de Salud (SFS) en la República Dominicana. Se pretende permitir a los usuarios filtrar, ordenar, agrupar y explorar los datos de forma intuitiva para obtener una comprensión más profunda de este importante sector de la salud en el país.
 
 
-Tema y problemática
 
-Análisis de las Administradoras de Riesgos de Salud (ARS) en el Seguro Familiar de Salud (SFS) de la República Dominicana, partiendo del planteamiento de una problemática de tu interés en torno a este tema.
- 
-Entregables
+## Objetivo
 
-Análisis tipo ensayo sobre la situación actual del regimen contributivo del SFS en RD y las ARS que lo componen bajo el enfoque de una problemática de tu interés, en un documento MS Word (o Google Docs) de 2 á 3 páginas de cuerpo (sin contar bibliografía, referencias documentales ni anexos) a 1 un espacio interlineal en letra Calibri 12.
+El objetivo principal es optar por la posición de Analista de Ciencia de Datos en Inteligencia PDSS, utilizando como caso de estudio el análisis de las ARS en el SFS.
 
-Documento(s) adjunto(s) en MS Excel (o Google Sheets o CSV) con los datos utilizados. 
+## Tema y problemática
 
-Tablero de control (dashboard) con las dimensiones, medidas e indicadores más relevantes que sustentan tu ensayo en una página web interactiva alojada en tu máquina local o en un servidor en la nube, con código fuente en Github, Gitlab o similares. 
+Este análisis se enfocará en la situación actual del régimen contributivo del SFS en RD y las ARS que lo componen, abordando una problemática específica que sea relevante e interesante para el análisis detallado.
 
-Nota: no se aceptará este entregable en Excel, Power BI o Tableau ni en plataformas comerciales semejantes, sino en Python (Flask, Dash, Shiny, etc.), R (Shiny, Plumber), Javascript, .NET y similares.
- 
-Fuentes de información y metodología
+## Entregables
 
-Puedes utilizar (de manera inclusiva no excluyente), los datos contenidos en la página de estadísticas de la Superintendencia de Salud y Riesgos Laborales (SISALRIL). 
-Asimismo puedes emplear los métodos y modelos de análisis que entiendas pertinentes a la problemática que te hayas planteado en torno al tema.
- 
-Criterios de evaluación
+1. **Análisis Tipo Ensayo**: Se entregará un documento en formato MS Word o Google Docs que contenga un ensayo de 2 a 3 páginas (sin contar bibliografía ni referencias) con un espacio interlineal de 1 en letra Calibri 12. Este ensayo abordará la situación actual del régimen contributivo del SFS en RD y las ARS bajo el enfoque de la problemática seleccionada.
 
-Búsqueda y procesamiento de información
-Pensamiento analítico, crítico y sistémico
-Visión de negocios y orientación al logro
-Creatividad e innovación
-Uso de herramientas de análisis y programación
-Comunicación efectiva.
- 
- 
-Fecha de entrega
-Máximo catorce (14) días calendario a partir de la entrevista y solicitud iniciales
+2. **Documento(s) Adjunto(s)**: Se adjuntarán los datos utilizados en formato MS Excel, Google Sheets o CSV.
 
-Envíoa:
-Alfonso Then
+3. **Tablero de Control (Dashboard)**: Se creará un tablero de control interactivo alojado en una página web, utilizando herramientas como Dash o Streamlit en Python. El código fuente estará disponible en un repositorio en Github, Gitlab o similares.
+
+## Fuentes de Información y Metodología
+
+Se utilizarán los datos disponibles en la página de estadísticas de la Superintendencia de Salud y Riesgos Laborales (SISALRIL) de forma inclusiva, pero no excluyente. Además, se emplearán métodos y modelos de análisis pertinentes a la problemática planteada.
+## Metodología
+1. Se recopilaron datos de la página de estadísticas de la Superintendencia de Salud y Riesgos Laborales (SISALRIL).
+2. Se realizó un análisis exploratorio de datos (EDA) para comprender las características del conjunto de datos.
+3. Se aplicaron técnicas estadísticas para identificar patrones y tendencias.
+4. Se visualizaron los resultados mediante gráficos y tablas.
+
+## Resultados
+- Se encontraron diferencias significativas en la cobertura, calidad y eficiencia entre las diferentes ARS.
+- Se identificaron algunos factores que influyen en la elección de ARS por parte de los usuarios.
+- Se formularon recomendaciones para mejorar la gestión del SFS.
+
+## Conclusiones
+Este análisis proporciona una visión general del estado actual del SFS y las ARS en la República Dominicana. Los resultados del estudio pueden ser utilizados por las autoridades sanitarias para mejorar la calidad y eficiencia del sistema de salud.
+
+## Próximos Pasos
+- Se recomienda realizar un análisis más profundo de los factores que influyen en la elección de ARS por parte de los usuarios.
+- Se sugiere desarrollar un modelo predictivo para identificar las ARS con mayor riesgo de insolvencia.
+- Se propone realizar un estudio comparativo del SFS con otros sistemas de salud de la región.
+
+## Criterios de Evaluación
+
+Los entregables serán evaluados en base a los siguientes criterios:
+
+- Búsqueda y procesamiento de información
+- Pensamiento analítico, crítico y sistémico
+- Visión de negocios y orientación al logro
+- Creatividad e innovación
+- Uso de herramientas de análisis y programación
+- Comunicación efectiva
+## Herramientas
+Se utilizaron las siguientes herramientas para realizar este análisis:
+- Python
+- Dash
+- Pandas
+- Matplotlib
+- Seaborn
+
+## Limitaciones
+- Este análisis se basa en datos públicos disponibles en la página web de la SISALRIL.
+- Es posible que existan otros factores que no se han considerado en este estudio.
+## Fecha de Entrega
+
+El plazo máximo para la entrega de todos los entregables será de catorce (14) días calendario a partir de la entrevista y solicitud iniciales.
+
+## Envío
+
+Enviar los entregables a Alfonso Then.
+
