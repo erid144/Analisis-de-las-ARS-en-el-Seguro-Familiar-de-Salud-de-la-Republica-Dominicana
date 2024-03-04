@@ -22,6 +22,7 @@ if missing_libraries:
     subprocess.run(["pip", "install", *missing_libraries], capture_output=True)
 
 # Import the required libraries, including Dash, Streamlit, and Lazy Predict
+import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt

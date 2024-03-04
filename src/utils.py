@@ -583,8 +583,186 @@ def install_requirements(filepath='requirements.txt'):
     except FileNotFoundError:
         print("No requirements.txt file found. Continuing with the execution...")
 
+
+    
+def Normalizar_fecha(dataframe, columna_fecha='Periodo de Cobertura'):
+    """
+    Toma la columna de fecha del dataframe crea dos columnas auxiliares año y mes
+    y con ellas formatea la columna de fecha en tipo de dato fecha
+
+    Parameters:
+    -----------
+    dataframe: pandas dataframe
+    columna_fecha: str = 'Periodo de Cobertura' en formato YYYYMM donde Y corresponden a digitos de año y M de mes
+
+    Returns:
+    --------
+    None
+    """
+    dataframe[columna_fecha] = dataframe[columna_fecha].astype(int)
+    # Separar year y month
+    dataframe['Year'] = dataframe[columna_fecha] // 100
+    dataframe['Month'] = dataframe[columna_fecha] % 100
+    
+    # Convertir a formato de fecha
+    dataframe[columna_fecha] = pd.to_datetime(dataframe['Year'].astype(str) + dataframe['Month'].astype(str), format='%Y%m')
+def Extraer_Afiliados_Edad_Sexo():
+    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx"
+    df_header = pd.read_excel(data, header=5, nrows=1)# para el encabezado
+    df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Afiliados']
+
+    # Seleccionar datos de la fila 205 a la 400 Hombres
+    df_data1 = pd.read_excel(data, header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
+
+    # Seleccionar datos de la fila 402 a la 597 Mujeres
+    df_data2 = pd.read_excel(data, header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
+
+
+    # Concatenar los datos
+    df = pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = df_header.columns[:20]
+
+    Normalizar_fecha(df)
+    # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
+    df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
+    df.to_csv('data/SISALRIL/afiliacion/RC_Afiliados_Edad_Sexo.csv', index=False)
+def Extraer_TasaDependencia_RC_ARS():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_03.xlsx", header=11, nrows=208-12,usecols="A:I")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'Total_RC_Tasa_Dependencia',
+    'Total_RC_Tasa_Dep_Directa',
+    'ARS_AutoGest_Tasa_Dep_Directa',
+    'ARS_AutoGest_Tasa_Dependencia',
+    'ARS_Priv_Tasa_Dep_Directa',
+    'ARS_Priv_Tasa_Dependencia',
+    'ARS_Pub_Tasa_Dep_Directa',
+    'ARS_Pub_Tasa_Dependencia',
+    ]
+
+
+    # Concatenar los datos
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/RC_TasaDependencia_RC_ARS.csv', index=False)
+def Extraer_AfiliadosCotizantes_Edad_Sexo():
+    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_07.xlsx"
+    df_header = pd.read_excel(data, header=6, nrows=2, usecols="A:R")# para el encabezado
+    df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Cotizantes']
+
+    # Seleccionar datos  Hombres
+    df_data1 = pd.read_excel(data, header=None, skiprows=205, nrows=401-206, usecols="A:R")
+
+    # Seleccionar datos  Mujeres
+    df_data2 = pd.read_excel(data, header=None, skiprows=402, nrows=598-403, usecols="A:R")
+
+
+    # Concatenar los datos
+    df = pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = df_header.columns[:20]
+
+    Normalizar_fecha(df)
+    # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
+    df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
+    df.to_csv('data/SISALRIL/afiliacion/RC_AfiliadosCotizantes_Edad_Sexo.csv', index=False)
+def Extraer_AfiliadosNoCotizantes_Edad_Sexo():
+    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_08.xlsx"
+    df_header = pd.read_excel(data, header=4, nrows=1)# para el encabezado
+    df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Afiliados']
+
+    # Seleccionar datos de la fila 205 a la 400 Hombres
+    df_data1 = pd.read_excel(data, header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
+
+    # Seleccionar datos de la fila 402 a la 597 Mujeres
+    df_data2 = pd.read_excel(data, header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
+
+
+    # Concatenar los datos
+    df = pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = df_header.columns[:20]
+
+    Normalizar_fecha(df)
+    # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
+    df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
+    df.to_csv('data/SISALRIL/afiliacion/RC_AfiliadosNoCotizantes_Edad_Sexo.csv', index=False)
+def Extraer_Tabla_Regiones():
+    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_04.xlsx"
+    df = pd.read_excel(data, header=6, nrows=55-7, usecols="A:C")# para el encabezado
+
+
+    df = df.iloc[2:-1]
+
+    # Rellenar los valores vacíos en la columna 'Provincia' con los valores correspondientes en la columna 'Región Salud'
+    df['Provincia'] = df['Provincia'].fillna(df['Región Salud'])
+    df = df.ffill()
+    df.reset_index(drop=True, inplace=True)
+    df.to_csv('data/SISALRIL/afiliacion/RC_Tabla_Regiones.csv', index=False)
+
+    
+def Extraer_datos_regionales(datapath, header_=7, rows_=54-7, archivocsv='data.csv'):
+    df = pd.read_excel(datapath, header=header_, nrows=rows_, usecols="C:GQ")
+    df.columns.values[0] ="Provincia"
+
+    # Valores faltantes para rellenar en orden
+    valores_faltantes = [
+        'Total general',  #0
+        'Total Región Distrito Nacional',#1
+        'Total Región Este',#6
+        'Total Región Norte',#13
+        'Total Región Sur',# 32
+        'No Especificada'# 46
+    ]
+
+
+    # Rellenar los valores faltantes en la columna 'Provincia'
+    df.loc[df['Provincia'].isna(), 'Provincia'] = valores_faltantes
+    df=df.T
+    df = df.set_axis(df.iloc[0], axis=1)
+    df = df.iloc[1:]
+    df.reset_index(inplace=True)
+    df.rename(columns={'index': 'Mes'}, inplace=True)
+    # Asignar None al nombre del índice
+    df.columns.name = None
+    df.reset_index(drop=True, inplace=True)
+    # Convertir la columna 'Mes' a tipo de datos de cadena (string)
+
+    df['Month'] = df['Mes'].apply(lambda x: re.match(r'(\w+)(?:\s*\.\s*)?(\d+)?', str(x)).group(1).lower())
+    
+
+
+     # Mapear el nombre del mes a su número correspondiente
+    month_mapping = {
+        'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12,
+        'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4, 'mayo': 5, 'junio': 6,
+        'julio': 7, 'agosto': 8
+    }
+
+    # Aplicar el mapeo para obtener el número del mes
+    df['Month'] = df['Month'].map(month_mapping)
+    df['Year'] = 2007
+    # Incrementar el valor de 'Year' cada 12 registros a partir del quinto registro
+    df.loc[4:, 'Year'] = (df.index[4:] -4) // 12 + 2008
+
+    del df['Mes']
+    # Crear la columna 'Periodo de Cobertura' como tipo fecha
+    df['Periodo de Cobertura'] = pd.to_datetime(df['Year'].astype(str) + df['Month'].astype(str), format='%Y%m')
+
+    # Guardar los datos en un archivo CSV
+    df.to_csv(archivocsv, index=False)
+    
+    
 def extraer_afiliados():
-       """
+    """
     Extrae y normaliza los datos de afiliados.
 
     Parameters:
@@ -595,30 +773,26 @@ def extraer_afiliados():
     --------
     None
     """
-    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx", header=5, nrows=1)
-    df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Afiliados']
+    Extraer_Afiliados_Edad_Sexo()
+    Extraer_TasaDependencia_RC_ARS()
+    Extraer_AfiliadosCotizantes_Edad_Sexo()
+    Extraer_AfiliadosNoCotizantes_Edad_Sexo()
+    Extraer_Tabla_Regiones()
+  
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_04.xlsx"
+    datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales.csv'
+    Extraer_datos_regionales(data_path, header_=7, rows_=54-7, archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_05.xlsx"
+    datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_Cotizantes.csv'
+    Extraer_datos_regionales(data_path, header_=7, rows_=54-7, archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_06.xlsx"
+    datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_NoCotizantes.csv'
+    Extraer_datos_regionales(data_path, header_=6, rows_=54-7, archivocsv=datafile)
 
-    # Seleccionar datos de la fila 205 a la 400
-    df_data1 = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx", header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
-
-    # Seleccionar datos de la fila 402 a la 597
-    df_data2 = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx", header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
 
 
-    # Concatenar los datos
-    df = pd.concat([df_data1, df_data2])
-    df.reset_index(drop=True, inplace=True)
-    # Especificar los nombres de las primeras dos columnas
-    df.columns = df_header.columns[:20]
 
-    # Separar year y month
-    df['Year'] = df['Periodo de Cobertura'] // 100
-    df['Month'] = df['Periodo de Cobertura'] % 100
-    # Convertir a formato de fecha
-    df['Periodo de Cobertura'] = pd.to_datetime(df['Year'].astype(str) + df['Month'].astype(str), format='%Y%m')
 
-    # Convertir valores a tipo entero
-    #df=df.astype(int)
-    # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
-    df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
-    df.to_csv('data/SISALRIL/afiliacion/RC_Afiliados_Edad_Sexo.csv', index=False)
+
