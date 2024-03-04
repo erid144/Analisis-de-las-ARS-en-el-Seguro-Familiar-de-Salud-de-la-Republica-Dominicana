@@ -526,13 +526,13 @@ def train_and_evaluate(clf, X_train, y_train, X_test, y_test):
     plt.legend()
     plt.show()
 
-def generate_requirements_txt(filename):
+def generate_requirements_txt(filename="requirements.txt"):
     """
     Generates a `requirements.txt` file containing a list of all installed packages in the current environment.
 
     Parameters:
     -----------
-    filename : str
+    filename : str, optional (default="requirements.txt")
         The name of the file to be generated, without any path information.
 
     Returns:
@@ -583,3 +583,42 @@ def install_requirements(filepath='requirements.txt'):
     except FileNotFoundError:
         print("No requirements.txt file found. Continuing with the execution...")
 
+def extraer_afiliados():
+       """
+    Extrae y normaliza los datos de afiliados.
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    None
+    """
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx", header=5, nrows=1)
+    df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Afiliados']
+
+    # Seleccionar datos de la fila 205 a la 400
+    df_data1 = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx", header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
+
+    # Seleccionar datos de la fila 402 a la 597
+    df_data2 = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx", header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
+
+
+    # Concatenar los datos
+    df = pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = df_header.columns[:20]
+
+    # Separar year y month
+    df['Year'] = df['Periodo de Cobertura'] // 100
+    df['Month'] = df['Periodo de Cobertura'] % 100
+    # Convertir a formato de fecha
+    df['Periodo de Cobertura'] = pd.to_datetime(df['Year'].astype(str) + df['Month'].astype(str), format='%Y%m')
+
+    # Convertir valores a tipo entero
+    #df=df.astype(int)
+    # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
+    df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
+    df.to_csv('data/SISALRIL/afiliacion/RC_Afiliados_Edad_Sexo.csv', index=False)

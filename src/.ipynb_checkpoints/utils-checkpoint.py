@@ -526,13 +526,13 @@ def train_and_evaluate(clf, X_train, y_train, X_test, y_test):
     plt.legend()
     plt.show()
 
-def generate_requirements_txt(filename):
+def generate_requirements_txt(filename="requirements.txt"):
     """
     Generates a `requirements.txt` file containing a list of all installed packages in the current environment.
 
     Parameters:
     -----------
-    filename : str
+    filename : str, optional (default="requirements.txt")
         The name of the file to be generated, without any path information.
 
     Returns:
