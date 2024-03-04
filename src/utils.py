@@ -819,7 +819,31 @@ def Extraer_SFS_Porcentaje_Regimen():
     Normalizar_fecha(df)
     df.to_csv('data/SISALRIL/afiliacion/SFS_Porcentaje_Regimen.csv', index=False)
     return df
+def Extraer_FinanciamientoDispersado_TipoAfiliado(datapath, header_=7, rows_=204-7, skip=0, columns_="A:M", column_names=[], archivocsv='data.csv'):
+    if not column_names:
+        column_names = [
+            'Periodo de Cobertura',
+            'Total_Capitas_Dispersadas',
+            'Total_Capitas_Dispersada_mes',
+            'Total_Capitas_Dispersada_posterior',
+            'Titulares_Total',
+            'Titulares_Dispersadas_mes',
+            'Titulares_Dispersadas_posterior',
+            'Dependientes_Total',
+            'Dependientes_Dispersadas_mes',
+            'Dependientess_Dispersadas_posterior',
+            'Adicionales_Total',
+            'Adicionales_Dispersadas_mes',
+            'Adicionales_Dispersadas_posterior'
+        ]
 
+    df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
+    df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
+    df.columns = column_names
+   # return df
+    Normalizar_fecha(df,columna_fecha='Periodo de Cobertura')
+    df.to_csv(archivocsv, index=False)
+   # return df
 def extraer_afiliados():
     """
     Extrae y normaliza los datos de afiliados.
@@ -850,8 +874,86 @@ def extraer_afiliados():
     datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_NoCotizantes.csv'
     Extraer_datos_regionales(data_path, header_=6, rows_=54-7, archivocsv=datafile)
     Extraer_SFS_Afiliacion_Tasa_Regimen()
+    Extraer_SFS_Regimen_Sexo()
+    Extraer_SFS_Porcentaje_Regimen()
+
+def extraer_financiamiento():
+    """
+    Extrae y normaliza los datos de financiamiento.
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    None
+    """
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_TipoAfiliado_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_TipoAfiliado_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
+
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_02.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersado_TipoAfiliado_Periodo.csv'
+    names_ = [
+                'Periodo de Cobertura',
+                'Total_Capitas_Dispersadas',
+                'Total_Capitas_Titulares',
+                'Total_Capitas_Depend_Directos',
+                'Total_Capitas_Depend_Adicionales',
+                'Monto_Dispersado_Total',
+                'Monto_Dispersado_Titulares',
+                'Monto_Dispersado_Dep_Directos',
+                'Monto_Dispersado_Dep_Adicionales',
+
+            ]
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=6, rows_=202-6, skip=6, columns_="A:I", column_names=names_, archivocsv=datafile)
 
 
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_03.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Autogestion_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_03.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Autogestion_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
 
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_04.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Privada_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_04.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Privada_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
 
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_05.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Publicas_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_05.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Publicas_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
 
+    names_ = [
+                    'Periodo de Cobertura',
+                    'Total Empresas con aportes',
+                    'Recaudo SFS',
+                    'Cuidado de la Salud',
+                    'Estancias Infantiles',
+                    'Subsidios',
+                    'Comisión Operación SISALRIL',
+                    'Cápita Adicional',
+                    'Recargo por Atraso en pago de Facturas',
+
+                ]
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_SFS_01.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoSFS_Periodo_Cuenta.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=10, rows_=208-11, skip=11, columns_="A:I", column_names=names_, archivocsv=datafile)
+    names_ = [
+                    'Periodo de Cobertura',
+                    'Salario Mínimo Cotizable',
+                    'Tope de Salario Mínimo Cotizable',
+                ]
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_SFS_03.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/SFS_TopeSalarioMinimoContizable.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=8, rows_=255-9, skip=9, columns_="A:C", column_names=names_, archivocsv=datafile)

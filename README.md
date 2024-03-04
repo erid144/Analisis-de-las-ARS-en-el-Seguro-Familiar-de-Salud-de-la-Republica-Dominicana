@@ -28,22 +28,16 @@ Este análisis se enfocará en la situación actual del régimen contributivo de
 Se utilizarán los datos disponibles en la página de estadísticas de la Superintendencia de Salud y Riesgos Laborales (SISALRIL) de forma inclusiva, pero no excluyente. Además, se emplearán métodos y modelos de análisis pertinentes a la problemática planteada.
 ## Metodología
 1. Se recopilaron datos de la página de estadísticas de la Superintendencia de Salud y Riesgos Laborales (SISALRIL).
-2. Se realizó un análisis exploratorio de datos (EDA) para comprender las características del conjunto de datos.
-3. Se aplicaron técnicas estadísticas para identificar patrones y tendencias.
-4. Se visualizaron los resultados mediante gráficos y tablas.
+2. Análisis exploratorio de datos (EDA) para comprender las características del conjunto de datos.
+3. Técnicas estadísticas para identificar patrones y tendencias.
+4. Visualizacion los resultados mediante gráficos y tablas.
 
 ## Resultados
-- Se encontraron diferencias significativas en la cobertura, calidad y eficiencia entre las diferentes ARS.
-- Se identificaron algunos factores que influyen en la elección de ARS por parte de los usuarios.
-- Se formularon recomendaciones para mejorar la gestión del SFS.
+
 
 ## Conclusiones
-Este análisis proporciona una visión general del estado actual del SFS y las ARS en la República Dominicana. Los resultados del estudio pueden ser utilizados por las autoridades sanitarias para mejorar la calidad y eficiencia del sistema de salud.
 
 ## Próximos Pasos
-- Se recomienda realizar un análisis más profundo de los factores que influyen en la elección de ARS por parte de los usuarios.
-- Se sugiere desarrollar un modelo predictivo para identificar las ARS con mayor riesgo de insolvencia.
-- Se propone realizar un estudio comparativo del SFS con otros sistemas de salud de la región.
 
 ## Criterios de Evaluación
 

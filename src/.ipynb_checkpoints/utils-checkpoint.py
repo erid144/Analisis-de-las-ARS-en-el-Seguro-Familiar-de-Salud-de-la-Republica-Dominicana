@@ -760,7 +760,90 @@ def Extraer_datos_regionales(datapath, header_=7, rows_=54-7, archivocsv='data.c
     # Guardar los datos en un archivo CSV
     df.to_csv(archivocsv, index=False)
     
-    
+def Extraer_SFS_Afiliacion_Tasa_Regimen():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_03.xlsx", header=11, nrows=208-12,usecols="A:E")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'SFS',
+    'Tasa_Dep_Regimen_Subsidiado',
+    'RC_Tasa_Dependencia',
+    'RC_Tasa_Dependencia_Directa',
+    ]
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/SFS_Afiliacion_Tasa_Regimen.csv', index=False)
+    return df
+def Extraer_SFS_Regimen_Sexo():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_05.xlsx", header=7, nrows=212-8,usecols="A:J")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'SFS_Total',
+    'SFS_Hombres',
+    'SFS_Mujeres',
+    'Reg_Subsidiado_Total',
+    'Reg_Subsidiado_Hombres',
+    'Reg_Subsidiado_Mujeres',
+    'RC_Total',
+    'RC_Hombres',
+    'RC_Mujeres',  
+    ]
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/SFS_Regimen_Sexo.csv', index=False)
+    return df
+def Extraer_SFS_Porcentaje_Regimen():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_07.xlsx", header=6, nrows=211-7,usecols="A:G")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'Poblacion Total proyectada',
+    'Porcentaje de Población Cubierta por el SFS',
+    'Total Seguro Familiar de Salud',
+    'Reg_Subsidiado',
+    'Reg_Contributivo',
+    'Reg_PensionadosJub',
+ 
+    ]
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/SFS_Porcentaje_Regimen.csv', index=False)
+    return df
+def Extraer_FinanciamientoDispersado_TipoAfiliado(datapath, header_=7, rows_=204-7, skip=0, columns_="A:M", column_names=[], archivocsv='data.csv'):
+    if not column_names:
+        column_names = [
+            'Periodo de Cobertura',
+            'Total_Capitas_Dispersadas',
+            'Total_Capitas_Dispersada_mes',
+            'Total_Capitas_Dispersada_posterior',
+            'Titulares_Total',
+            'Titulares_Dispersadas_mes',
+            'Titulares_Dispersadas_posterior',
+            'Dependientes_Total',
+            'Dependientes_Dispersadas_mes',
+            'Dependientess_Dispersadas_posterior',
+            'Adicionales_Total',
+            'Adicionales_Dispersadas_mes',
+            'Adicionales_Dispersadas_posterior'
+        ]
+
+    df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
+    df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
+    df.columns = column_names
+   # return df
+    Normalizar_fecha(df,columna_fecha='Periodo de Cobertura')
+    df.to_csv(archivocsv, index=False)
+   # return df
 def extraer_afiliados():
     """
     Extrae y normaliza los datos de afiliados.
@@ -778,14 +861,64 @@ def extraer_afiliados():
     Extraer_AfiliadosCotizantes_Edad_Sexo()
     Extraer_AfiliadosNoCotizantes_Edad_Sexo()
     Extraer_Tabla_Regiones()
+  
     data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_04.xlsx"
-    Extraer_datos_regionales(data_path, header_=7, rows_=54-7, archivocsv='data/SISALRIL/afiliacion/RC_Datos_Regionales.csv')
+    datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales.csv'
+    Extraer_datos_regionales(data_path, header_=7, rows_=54-7, archivocsv=datafile)
+    
     data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_05.xlsx"
-    Extraer_datos_regionales(data_path, header_=7, rows_=54-7, archivocsv='data/SISALRIL/afiliacion/RC_Datos_Regionales_Cotizantes.csv')
+    datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_Cotizantes.csv'
+    Extraer_datos_regionales(data_path, header_=7, rows_=54-7, archivocsv=datafile)
+    
     data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_06.xlsx"
-    Extraer_datos_regionales(data_path, header_=7, rows_=53-7, archivocsv='data/SISALRIL/afiliacion/RC_Datos_Regionales_NoCotizantes.csv')
+    datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_NoCotizantes.csv'
+    Extraer_datos_regionales(data_path, header_=6, rows_=54-7, archivocsv=datafile)
+    Extraer_SFS_Afiliacion_Tasa_Regimen()
+    Extraer_SFS_Regimen_Sexo()
+    Extraer_SFS_Porcentaje_Regimen()
+
+def extraer_financiamiento():
+    """
+    Extrae y normaliza los datos de financiamiento.
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    None
+    """
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_TipoAfiliado_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_TipoAfiliado_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
+
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_02.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersado_TipoAfiliado_Periodo.csv'
+    names_ = [
+                'Periodo de Cobertura',
+                'Total_Capitas_Dispersadas',
+                'Total_Capitas_Titulares',
+                'Total_Capitas_Depend_Directos',
+                'Total_Capitas_Depend_Adicionales',
+                'Monto_Dispersado_Total',
+                'Monto_Dispersado_Titulares',
+                'Monto_Dispersado_Dep_Directos',
+                'Monto_Dispersado_Dep_Adicionales',
+
+            ]
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=6, rows_=202-6, skip=6, columns_="A:I", column_names=names_, archivocsv=datafile)
 
 
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_03.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Autogestion_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_03.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Autogestion_postMes.csv'
+    Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
 
 
 
