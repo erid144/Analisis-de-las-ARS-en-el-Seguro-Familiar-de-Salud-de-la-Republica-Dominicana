@@ -760,7 +760,66 @@ def Extraer_datos_regionales(datapath, header_=7, rows_=54-7, archivocsv='data.c
     # Guardar los datos en un archivo CSV
     df.to_csv(archivocsv, index=False)
     
-    
+def Extraer_SFS_Afiliacion_Tasa_Regimen():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_03.xlsx", header=11, nrows=208-12,usecols="A:E")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'SFS',
+    'Tasa_Dep_Regimen_Subsidiado',
+    'RC_Tasa_Dependencia',
+    'RC_Tasa_Dependencia_Directa',
+    ]
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/SFS_Afiliacion_Tasa_Regimen.csv', index=False)
+    return df
+def Extraer_SFS_Regimen_Sexo():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_05.xlsx", header=7, nrows=212-8,usecols="A:J")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'SFS_Total',
+    'SFS_Hombres',
+    'SFS_Mujeres',
+    'Reg_Subsidiado_Total',
+    'Reg_Subsidiado_Hombres',
+    'Reg_Subsidiado_Mujeres',
+    'RC_Total',
+    'RC_Hombres',
+    'RC_Mujeres',  
+    ]
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/SFS_Regimen_Sexo.csv', index=False)
+    return df
+def Extraer_SFS_Porcentaje_Regimen():
+    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_07.xlsx", header=6, nrows=211-7,usecols="A:G")
+    # Lista de nombres de columna
+    column_names = [
+    'Periodo de Cobertura',
+    'Poblacion Total proyectada',
+    'Porcentaje de Población Cubierta por el SFS',
+    'Total Seguro Familiar de Salud',
+    'Reg_Subsidiado',
+    'Reg_Contributivo',
+    'Reg_PensionadosJub',
+ 
+    ]
+    df =df_header# pd.concat([df_data1, df_data2])
+    df.reset_index(drop=True, inplace=True)
+    # Especificar los nombres de las primeras dos columnas
+    df.columns = column_names
+    Normalizar_fecha(df)
+    df.to_csv('data/SISALRIL/afiliacion/SFS_Porcentaje_Regimen.csv', index=False)
+    return df
+
 def extraer_afiliados():
     """
     Extrae y normaliza los datos de afiliados.
@@ -790,7 +849,7 @@ def extraer_afiliados():
     data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_06.xlsx"
     datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_NoCotizantes.csv'
     Extraer_datos_regionales(data_path, header_=6, rows_=54-7, archivocsv=datafile)
-
+    Extraer_SFS_Afiliacion_Tasa_Regimen()
 
 
 
