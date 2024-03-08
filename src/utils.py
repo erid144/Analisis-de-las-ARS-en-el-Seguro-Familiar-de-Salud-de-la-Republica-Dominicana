@@ -142,155 +142,6 @@ def plot_flight_analysis(df):
     )
     pyo.iplot(fig5)
 
-def en_temporada_alta(fecha):
-    """
-    Devuelve 1 si la fecha está en temporada alta, 0 en caso contrario.
-    Temporada alta se define como Fecha-I entre 15-Dic y 3-Mar, 15-Jul y 31-Jul, o 11-Sep y 30-Sep.
-
-    Args:
-    fecha (datetime): Fecha a comprobar si está en temporada alta.
-
-    Returns:
-    int: 1 si la fecha está en temporada alta, 0 en caso contrario.
-    """
-    return ((fecha.month == 12 and fecha.day >= 15) or
-            (fecha.month == 1 or fecha.month == 2) or
-            (fecha.month == 3 and fecha.day <= 3) or
-            (fecha.month == 7 and fecha.day >= 15 and fecha.day <= 31) or
-            (fecha.month == 9 and fecha.day >= 11 and fecha.day <= 30))
-
-def atraso_func(x):
-    """
-    Devuelve 1 si la diferencia en minutos es mayor que 15, 0 en caso contrario.
-
-    Args:
-    x (float): Diferencia en minutos entre dos fechas.
-
-    Returns:
-    int: 1 si la diferencia en minutos es mayor que 15, 0 en caso contrario.
-    """
-    return 1 if x > 15 else 0
-
-def periodo_func(x):
-    """
-    Devuelve 'mañana', 'tarde' o 'noche' según la hora de la fecha.
-
-    Args:
-    x (datetime): Fecha a comprobar.
-
-    Returns:
-    str: 'mañana' si la hora de la fecha está entre las 5:00 y las 11:59,
-         'tarde' si está entre las 12:00 y las 18:59,
-         'noche' si está entre las 19:00 y las 4:59.
-    """
-    return 'mañana' if 5 <= x.hour <= 11 else ('tarde' if 12 <= x.hour <= 18 else 'noche')
-
-def nuevas_columnas(df):
-    """
-    Agrega las columnas 'temporada_alta', 'dif_min', 'atraso_15' y 'periodo_dia' al DataFrame.
-
-    Args:
-    df (pandas.DataFrame): DataFrame al que se agregarán las nuevas columnas.
-
-    Returns:
-    pandas.DataFrame: DataFrame original con las nuevas columnas agregadas.
-    """
-    # crear columna temporada_alta
-    df['temporada_alta'] = df['Fecha-I'].apply(en_temporada_alta).astype(int)
-    
-    # crear columna dif_min
-    df['dif_min'] = (df['Fecha-O'] - df['Fecha-I']).apply(lambda x: x.total_seconds()/60)
-    
-    # crear columna atraso_15
-    df['atraso_15'] = df['dif_min'].apply(atraso_func)
-    
-    # crear columna periodo_dia
-    df['periodo_dia'] = df['Fecha-I'].apply(periodo_func)
-    
-    return df
-
-def duration(row):
-    """
-    Calculates the duration of the flight in minutes.
-
-    Parameters:
-    -----------
-    row : pandas.Series
-        A pandas series representing a row of flight data containing the 'Fecha-O'
-        and 'Fecha-I' columns.
-
-    Returns:
-    --------
-    float
-        The duration of the flight in minutes.
-    """
-    time_diff = pd.to_datetime(row['Fecha-O']) - pd.to_datetime(row['Fecha-I'])
-    return time_diff.total_seconds() / 60
-
-
-def time_since_last_departure(data):
-    """
-    Calculates the time since the last departure from the airport in minutes.
-
-    Parameters:
-    -----------
-    data : pandas.DataFrame
-        A pandas dataframe containing flight data with a 'Fecha-I' column representing
-        the departure date and time.
-
-    Returns:
-    --------
-    pandas.DataFrame
-        A new pandas dataframe with an additional 'time_since_last_departure' column
-        representing the time in minutes since the last departure from the airport.
-    """
-    data = data.sort_values(by='Fecha-I')
-    data['time_since_last_departure'] = data['Fecha-I'].diff().apply(lambda x: x.total_seconds() / 60)
-    return data
-
-
-def time_since_last_arrival(data):
-    """
-    Calculates the time since the last arrival at the airport in minutes.
-
-    Parameters:
-    -----------
-    data : pandas.DataFrame
-        A pandas dataframe containing flight data with a 'Fecha-O' column representing
-        the arrival date and time.
-
-    Returns:
-    --------
-    pandas.DataFrame
-        A new pandas dataframe with an additional 'time_since_last_arrival' column
-        representing the time in minutes since the last arrival at the airport.
-    """
-    data = data.sort_values(by='Fecha-O')
-    data['time_since_last_arrival'] = data['Fecha-O'].diff().apply(lambda x: x.total_seconds() / 60)
-    return data
-
-def is_weekend(row):
-    """
-    Determines whether a flight is on a weekend day or not.
-
-    Parameters:
-    -----------
-    row : pandas.Series
-        A pandas series representing a row of flight data containing the 'Fecha-I'
-        column.
-
-    Returns:
-    --------
-    int
-        Returns 1 if the flight is on a weekend day (Saturday or Sunday), and 0 otherwise.
-    """
-    day_of_week = pd.to_datetime(row['Fecha-I']).weekday()
-    if day_of_week >= 5:
-        return 1
-    else:
-        return 0
-
-
 
 
 def plot_delay_rate_by_group(df, grouping_column):
@@ -585,51 +436,76 @@ def install_requirements(filepath='requirements.txt'):
 
 
     
-def Normalizar_fecha(dataframe, columna_fecha='Periodo de Cobertura'):
+def Normalizar_fecha(df,CPeriodo='Periodo de Cobertura',CAno='Ano de Cobertura'):
     """
-    Toma la columna de fecha del dataframe crea dos columnas auxiliares año y mes
-    y con ellas formatea la columna de fecha en tipo de dato fecha
-
+    Toma la columna de fecha del dataframey evalua
+    Si existe una columna periodo de cobertura:
+        crea dos columnas auxiliares año y mes
+        y con ellas formatea la columna de fecha en tipo de dato fecha.
+    Si existe la columna Ano de Cobertura:
+       Extrae el año eliminando otros caracteres
     Parameters:
     -----------
-    dataframe: pandas dataframe
-    columna_fecha: str = 'Periodo de Cobertura' en formato YYYYMM donde Y corresponden a digitos de año y M de mes
-
+    df: pandas dataframe
+    Cperiodo: Nombre de la columna Periodo 
+    Cano: Nombre de la columna del año
+    
     Returns:
     --------
     None
     """
-    dataframe[columna_fecha] = dataframe[columna_fecha].astype(int)
-    # Separar year y month
-    dataframe['Year'] = dataframe[columna_fecha] // 100
-    dataframe['Month'] = dataframe[columna_fecha] % 100
+    if CPeriodo in df.columns:
+        df[CPeriodo] = df[CPeriodo].astype(str) 
+        # Extraer numericos
+        mask = df[CPeriodo].str.contains(r'\D', na=False)
+        df.loc[mask,CPeriodo] = df.loc[mask, CPeriodo].str.replace(r'\D', '', regex=True)
+        # Convertir la columna a tipo numérico si es necesario
+        df[CPeriodo] = pd.to_numeric(df[CPeriodo], errors='coerce')
+        df[CPeriodo] = df[CPeriodo].astype(int)
+        # Separar year y month
+        df['Year'] = df[CPeriodo] // 100
+        df['Month'] = df[CPeriodo] % 100
+
+        # Convertir a formato de fecha
+        df[CPeriodo] = pd.to_datetime(df['Year'].astype(str) + df['Month'].astype(str), format='%Y%m')
+        
+    if CAno in df.columns:
+        df[CAno] = df[CAno].astype(str) 
+        # Extraer solo el año de cobertura en formato YYYY
+        mask = df[CAno].str.contains(r'\D', na=False)
+        df.loc[mask, CAno] = df.loc[mask, CAno].str.replace(r'\D', '', regex=True)
+        df[CAno] = df[CAno].str[:4]
+        # Convertir la columna a tipo numérico si es necesario
+        df[CAno] = pd.to_numeric(df[CAno], errors='coerce')
+        
+def Extraer_Afiliados_Edad_Sexo(data_path, header_=5, rows_=400-205, archivocsv='data.csv'):
     
-    # Convertir a formato de fecha
-    dataframe[columna_fecha] = pd.to_datetime(dataframe['Year'].astype(str) + dataframe['Month'].astype(str), format='%Y%m')
-def Extraer_Afiliados_Edad_Sexo():
-    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx"
-    df_header = pd.read_excel(data, header=5, nrows=1)# para el encabezado
+    df_header = pd.read_excel(data_path, header=5, nrows=1)# para el encabezado
     df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Afiliados']
 
     # Seleccionar datos de la fila 205 a la 400 Hombres
-    df_data1 = pd.read_excel(data, header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
+    df_data1 = pd.read_excel(data_path, header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
 
     # Seleccionar datos de la fila 402 a la 597 Mujeres
-    df_data2 = pd.read_excel(data, header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
+    df_data2 = pd.read_excel(data_path, header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
 
 
     # Concatenar los datos
     df = pd.concat([df_data1, df_data2])
     df.reset_index(drop=True, inplace=True)
+    
     # Especificar los nombres de las primeras dos columnas
     df.columns = df_header.columns[:20]
 
     Normalizar_fecha(df)
     # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
     df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
-    df.to_csv('data/SISALRIL/afiliacion/RC_Afiliados_Edad_Sexo.csv', index=False)
-def Extraer_TasaDependencia_RC_ARS():
-    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_RC_PBS_03.xlsx", header=11, nrows=208-12,usecols="A:I")
+    df.to_csv(archivocsv, index=False)
+    #return df
+
+def Extraer_TasaDependencia_RC_ARS(data_path, header_=11, rows_=208-12, archivocsv='data.csv'):
+
+    df_header = pd.read_excel(data_path, header=11, nrows=208-12,usecols="A:I")
     # Lista de nombres de columna
     column_names = [
     'Periodo de Cobertura',
@@ -643,24 +519,25 @@ def Extraer_TasaDependencia_RC_ARS():
     'ARS_Pub_Tasa_Dependencia',
     ]
 
-
-    # Concatenar los datos
-    df =df_header# pd.concat([df_data1, df_data2])
+    df =df_header
     df.reset_index(drop=True, inplace=True)
-    # Especificar los nombres de las primeras dos columnas
+    
     df.columns = column_names
     Normalizar_fecha(df)
-    df.to_csv('data/SISALRIL/afiliacion/RC_TasaDependencia_RC_ARS.csv', index=False)
-def Extraer_AfiliadosCotizantes_Edad_Sexo():
-    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_07.xlsx"
-    df_header = pd.read_excel(data, header=6, nrows=2, usecols="A:R")# para el encabezado
+    
+    df.to_csv(archivocsv, index=False)
+    #return df
+
+def Extraer_AfiliadosCotizantes_Edad_Sexo(data_path, header_=6, rows_=401-206, archivocsv='data.csv'):
+    
+    df_header = pd.read_excel(data_path, header=6, nrows=2, usecols="A:R")# para el encabezado
     df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Cotizantes']
 
     # Seleccionar datos  Hombres
-    df_data1 = pd.read_excel(data, header=None, skiprows=205, nrows=401-206, usecols="A:R")
+    df_data1 = pd.read_excel(data_path, header=None, skiprows=205, nrows=401-206, usecols="A:R")
 
     # Seleccionar datos  Mujeres
-    df_data2 = pd.read_excel(data, header=None, skiprows=402, nrows=598-403, usecols="A:R")
+    df_data2 = pd.read_excel(data_path, header=None, skiprows=402, nrows=598-403, usecols="A:R")
 
 
     # Concatenar los datos
@@ -672,17 +549,20 @@ def Extraer_AfiliadosCotizantes_Edad_Sexo():
     Normalizar_fecha(df)
     # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
     df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
-    df.to_csv('data/SISALRIL/afiliacion/RC_AfiliadosCotizantes_Edad_Sexo.csv', index=False)
-def Extraer_AfiliadosNoCotizantes_Edad_Sexo():
-    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_08.xlsx"
-    df_header = pd.read_excel(data, header=4, nrows=1)# para el encabezado
+    
+    df.to_csv(archivocsv, index=False)
+    #return df
+
+def Extraer_AfiliadosNoCotizantes_Edad_Sexo(data_path, header_=4, rows_=400-205, archivocsv='data.csv'):
+    
+    df_header = pd.read_excel(data_path, header=4, nrows=1)# para el encabezado
     df_header.columns.values[:2] = ['Periodo de Cobertura', 'Total Afiliados']
 
     # Seleccionar datos de la fila 205 a la 400 Hombres
-    df_data1 = pd.read_excel(data, header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
+    df_data1 = pd.read_excel(data_path, header=None, skiprows=204, nrows=400-205, usecols=list(range(20)))
 
     # Seleccionar datos de la fila 402 a la 597 Mujeres
-    df_data2 = pd.read_excel(data, header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
+    df_data2 = pd.read_excel(data_path, header=None, skiprows=401, nrows=597-402, usecols=list(range(20)))
 
 
     # Concatenar los datos
@@ -694,10 +574,13 @@ def Extraer_AfiliadosNoCotizantes_Edad_Sexo():
     Normalizar_fecha(df)
     # Crear la columna 'Sexo' y asignar valores 'M' y 'F'
     df = df.assign(Sexo=['M'] * 195 + ['F'] * 195)
-    df.to_csv('data/SISALRIL/afiliacion/RC_AfiliadosNoCotizantes_Edad_Sexo.csv', index=False)
-def Extraer_Tabla_Regiones():
-    data="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_04.xlsx"
-    df = pd.read_excel(data, header=6, nrows=55-7, usecols="A:C")# para el encabezado
+    df.to_csv(archivocsv, index=False)
+    #return df
+
+def Extraer_Tabla_Regiones(data_path, header_=6, rows_=55-7, archivocsv='data.csv'):
+    
+
+    df = pd.read_excel(data_path, header=6, nrows=55-7, usecols="A:C")# para el encabezado
 
 
     df = df.iloc[2:-1]
@@ -706,7 +589,8 @@ def Extraer_Tabla_Regiones():
     df['Provincia'] = df['Provincia'].fillna(df['Región Salud'])
     df = df.ffill()
     df.reset_index(drop=True, inplace=True)
-    df.to_csv('data/SISALRIL/afiliacion/RC_Tabla_Regiones.csv', index=False)
+    df.to_csv(archivocsv, index=False)
+    #return df
 
     
 def Extraer_datos_regionales(datapath, header_=7, rows_=54-7, archivocsv='data.csv'):
@@ -759,9 +643,11 @@ def Extraer_datos_regionales(datapath, header_=7, rows_=54-7, archivocsv='data.c
 
     # Guardar los datos en un archivo CSV
     df.to_csv(archivocsv, index=False)
+    #return df
     
-def Extraer_SFS_Afiliacion_Tasa_Regimen():
-    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_03.xlsx", header=11, nrows=208-12,usecols="A:E")
+def Extraer_SFS_Afiliacion_Tasa_Regimen(datapath, header_=11, rows_=208-12, archivocsv='data.csv'):
+   
+    df_header = pd.read_excel(datapath, header=11, nrows=208-12,usecols="A:E")
     # Lista de nombres de columna
     column_names = [
     'Periodo de Cobertura',
@@ -775,10 +661,12 @@ def Extraer_SFS_Afiliacion_Tasa_Regimen():
     # Especificar los nombres de las primeras dos columnas
     df.columns = column_names
     Normalizar_fecha(df)
-    df.to_csv('data/SISALRIL/afiliacion/SFS_Afiliacion_Tasa_Regimen.csv', index=False)
-    return df
-def Extraer_SFS_Regimen_Sexo():
-    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_05.xlsx", header=7, nrows=212-8,usecols="A:J")
+    df.to_csv(archivocsv, index=False)
+    #return df
+    
+def Extraer_SFS_Regimen_Sexo(datapath, header_=7, rows_=212-8, archivocsv='data.csv'):
+   
+    df_header = pd.read_excel(datapath, header=7, nrows=212-8,usecols="A:J")
     # Lista de nombres de columna
     column_names = [
     'Periodo de Cobertura',
@@ -792,15 +680,18 @@ def Extraer_SFS_Regimen_Sexo():
     'RC_Hombres',
     'RC_Mujeres',  
     ]
-    df =df_header# pd.concat([df_data1, df_data2])
+    df =df_header
     df.reset_index(drop=True, inplace=True)
-    # Especificar los nombres de las primeras dos columnas
+    
     df.columns = column_names
     Normalizar_fecha(df)
-    df.to_csv('data/SISALRIL/afiliacion/SFS_Regimen_Sexo.csv', index=False)
-    return df
-def Extraer_SFS_Porcentaje_Regimen():
-    df_header = pd.read_excel("data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_07.xlsx", header=6, nrows=211-7,usecols="A:G")
+    df.to_csv(archivocsv, index=False)
+    #return df
+
+
+def Extraer_SFS_Porcentaje_Regimen(datapath, header_=6, rows_=211-7, archivocsv='data.csv'):
+    
+    df_header = pd.read_excel(datapath, header=6, nrows=211-7,usecols="A:G")
     # Lista de nombres de columna
     column_names = [
     'Periodo de Cobertura',
@@ -817,8 +708,9 @@ def Extraer_SFS_Porcentaje_Regimen():
     # Especificar los nombres de las primeras dos columnas
     df.columns = column_names
     Normalizar_fecha(df)
-    df.to_csv('data/SISALRIL/afiliacion/SFS_Porcentaje_Regimen.csv', index=False)
-    return df
+    df.to_csv(archivocsv, index=False)
+    #return df
+
 def Extraer_FinanciamientoDispersado_TipoAfiliado(datapath, header_=7, rows_=204-7, skip=0, columns_="A:M", column_names=[], archivocsv='data.csv'):
     if not column_names:
         column_names = [
@@ -840,10 +732,120 @@ def Extraer_FinanciamientoDispersado_TipoAfiliado(datapath, header_=7, rows_=204
     df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
     df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
     df.columns = column_names
-   # return df
+  
     Normalizar_fecha(df,columna_fecha='Periodo de Cobertura')
     df.to_csv(archivocsv, index=False)
+    # return df
+    
+def Extraer_FinanciamientoAnual(datapath, header_=7, rows_=204-7, skip=0, columns_="A:M", column_names=[], archivocsv='data.csv'):
+    if not column_names:
+        column_names = [
+            'Ano cobertura',
+            'Total_Salud (A)',
+            'PDSS_Subsidiado (A)',
+            'PDSS_Contributivo (A)',
+            'Otros_Planes_de_Salud (A)',
+            'PIB/Precios Corrientes (B)',
+            'Total en Relacion al PIB (A/B)',
+            'PDSS_Subsidiado en Relación al PIB (A/B)',
+            'PDSS_Contributivo en Relacion al PIB (A/B)',
+            'Otros_Planes_de_Salud en Relacion al PIB (A/B)'
+        ]
+
+    df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
+    df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
+    
+    df.columns = column_names
+    
+    
+    Normalizar_fecha(df)
+    df.to_csv(archivocsv, index=False)
+    #return df
+    
+    
+def Extraer_PrestacionesPBS(datapath, header_=7, rows_=230-7, skip=7, columns_="A:E", column_names=[], archivocsv='data.csv'):
+    if not column_names:
+        column_names = [
+            'Ano de Cobertura',
+            'Grupo Numero',
+            'Grupo Descripcion ',
+            'Montos Pagados',
+            'Distribucion Porcentual ',
+        ]
+
+    df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
+    df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
+    
+    df.columns = column_names
+     # Rellenar los valores faltantes en 'Grupo Número' con 0
+    df['Grupo Numero'] = df['Grupo Numero'].fillna(0)
+    
+    # Rellenar los valores faltantes en 'Grupo Descripción' con el texto en la columna 'Año de Cobertura'
+    df['Grupo Descripcion '] = df['Grupo Descripcion '].fillna(df['Ano de Cobertura'])
+    
+    # Extraer solo el año de cobertura en formato YYYY
+    Normalizar_fecha(df)
+    
+    df.to_csv(archivocsv, index=False)
+    #return df
+    
+def Extraer_SiniestralidadPBS(datapath, header_=9, rows_=204-9, skip=9, columns_="A:D", column_names=[], archivocsv='data.csv'):
+    if not column_names:
+        column_names = [
+            'Periodo de Cobertura',
+            'Ingresos en Salud',
+            'Gasto en Salud',
+            'Porcentaje (%) de Siniestralidad',
+        ]
+
+    df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
+    df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
+    
+    df.columns = column_names
+    
+    Normalizar_fecha(df)
+    df.to_csv(archivocsv, index=False)
    # return df
+
+def Extraer_SiniestralidadFlujos(datapath, header_=10, rows_=23-7, skip=[], columns_="A:E", column_names=[], archivocsv='data.csv'):
+    if not column_names:
+        column_names = [
+            'Ano de Cobertura',
+            'Ingresos ARS Total',
+            'Ingresos ARS Autogestion',
+            'Ingresos ARS Privada',
+            'Ingresos ARS Publica',
+            'Gastos ARS Total',
+            'Gastos ARS Autogestion',
+            'Gastos ARS Privada',
+            'Gastos ARS Publica',
+            'Siniestralidad ARS Total',
+            'Siniestralidad ARS Autogestion',
+            'Siniestralidad ARS Privada',
+            'Siniestralidad ARS Publica',    
+        ]
+    if not skip:
+        skip = [12,30,48]
+
+    df_header = pd.read_excel(datapath, header=header_, nrows=2, usecols=columns_)
+    df1 = pd.read_excel(datapath, header=None, skiprows=skip[0], nrows=rows_, usecols=columns_)
+    df1.columns = column_names[:5]
+    Normalizar_fecha(df1)
+    
+    df2 = pd.read_excel(datapath, header=None, skiprows=skip[1], nrows=rows_, usecols=columns_)
+    df2.columns = [column_names[0]] + column_names[5:9]
+    Normalizar_fecha(df2)
+    
+    df3 = pd.read_excel(datapath, header=None, skiprows=skip[2], nrows=rows_, usecols=columns_)
+    df3.columns = [column_names[0]] + column_names[9:]
+    Normalizar_fecha(df3)
+    df = pd.merge(df1, df2, on='Ano de Cobertura', how='inner')
+    df = pd.merge(df, df3, on='Ano de Cobertura', how='inner')
+    df.columns = column_names
+    
+    df.to_csv(archivocsv, index=False)
+    #return df
+    
 def extraer_afiliados():
     """
     Extrae y normaliza los datos de afiliados.
@@ -856,11 +858,25 @@ def extraer_afiliados():
     --------
     None
     """
-    Extraer_Afiliados_Edad_Sexo()
-    Extraer_TasaDependencia_RC_ARS()
-    Extraer_AfiliadosCotizantes_Edad_Sexo()
-    Extraer_AfiliadosNoCotizantes_Edad_Sexo()
-    Extraer_Tabla_Regiones()
+    data_path="data/SISALRIL/afiliacion/Afiliacion_RC_PBS_02.xlsx"
+    datafile ='data/SISALRIL/afiliacion/RC_Afiliados_Edad_Sexo.csv'
+    Extraer_Afiliados_Edad_Sexo(data_path,  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_03.xlsx"
+    datafile = 'data/SISALRIL/afiliacion/RC_TasaDependencia_RC_ARS.csv'
+    Extraer_TasaDependencia_RC_ARS(data_path,  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_07.xlsx"
+    datafile= 'data/SISALRIL/afiliacion/RC_AfiliadosCotizantes_Edad_Sexo.csv'
+    Extraer_AfiliadosCotizantes_Edad_Sexo(data_path,  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_08.xlsx"
+    datafile= 'data/SISALRIL/afiliacion/RC_AfiliadosNoCotizantes_Edad_Sexo.csv'
+    Extraer_AfiliadosNoCotizantes_Edad_Sexo(data_path,  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_04.xlsx"
+    datafile= 'data/SISALRIL/afiliacion/RC_Tabla_Regiones.csv' 
+    Extraer_Tabla_Regiones(data_path,  archivocsv=datafile)
   
     data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_04.xlsx"
     datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales.csv'
@@ -873,9 +889,18 @@ def extraer_afiliados():
     data_path = "data/SISALRIL/afiliacion/Afiliacion_RC_PBS_06.xlsx"
     datafile ='data/SISALRIL/afiliacion/RC_Datos_Regionales_NoCotizantes.csv'
     Extraer_datos_regionales(data_path, header_=6, rows_=54-7, archivocsv=datafile)
-    Extraer_SFS_Afiliacion_Tasa_Regimen()
-    Extraer_SFS_Regimen_Sexo()
-    Extraer_SFS_Porcentaje_Regimen()
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_03.xlsx"
+    datafile = 'data/SISALRIL/afiliacion/SFS_Afiliacion_Tasa_Regimen.csv'
+    Extraer_SFS_Afiliacion_Tasa_Regimen(data_path,  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_05.xlsx"
+    datafile = 'data/SISALRIL/afiliacion/SFS_Regimen_Sexo.csv'
+    Extraer_SFS_Regimen_Sexo(data_path,  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/afiliacion/Afiliacion_SFS_PBS_07.xlsx"
+    datafile = 'data/SISALRIL/afiliacion/SFS_Porcentaje_Regimen.csv'
+    Extraer_SFS_Porcentaje_Regimen(data_path,  archivocsv=datafile)
 
 def extraer_financiamiento():
     """
@@ -892,6 +917,7 @@ def extraer_financiamiento():
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_01.xlsx"
     datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_TipoAfiliado_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_01.xlsx"
     datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_TipoAfiliado_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
@@ -916,6 +942,7 @@ def extraer_financiamiento():
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_03.xlsx"
     datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Autogestion_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_03.xlsx"
     datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Autogestion_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
@@ -923,6 +950,7 @@ def extraer_financiamiento():
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_04.xlsx"
     datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Privada_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_04.xlsx"
     datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Privada_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
@@ -930,6 +958,7 @@ def extraer_financiamiento():
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_05.xlsx"
     datafile = 'data/SISALRIL/financiamiento/CapitasDispersadoARS_Publicas_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=204-8, skip=8, columns_="A:M", column_names=[], archivocsv=datafile)
+    
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_PBS_05.xlsx"
     datafile = 'data/SISALRIL/financiamiento/MontoDispersadoARS_Publicas_postMes.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=7, rows_=401-205, skip=205, columns_="A:M", column_names=[], archivocsv=datafile)
@@ -949,6 +978,7 @@ def extraer_financiamiento():
     data_path = "data/SISALRIL/financiamiento/Financiamiento_RC_SFS_01.xlsx"
     datafile = 'data/SISALRIL/financiamiento/MontoSFS_Periodo_Cuenta.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=10, rows_=208-11, skip=11, columns_="A:I", column_names=names_, archivocsv=datafile)
+    
     names_ = [
                     'Periodo de Cobertura',
                     'Salario Mínimo Cotizable',
@@ -957,3 +987,87 @@ def extraer_financiamiento():
     data_path = "data/SISALRIL/financiamiento/Financiamiento_SFS_03.xlsx"
     datafile = 'data/SISALRIL/financiamiento/SFS_TopeSalarioMinimoContizable.csv'
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=8, rows_=255-9, skip=9, columns_="A:C", column_names=names_, archivocsv=datafile)
+    
+    names_ =  [
+                'Año',    
+                'Total_Salud (A)',
+                'PDSS_Subsidiado (A)',
+                'PDSS_Contributivo (A)',
+                'Otros_Planes_de_Salud (A)',
+                'PIB/Precios Corrientes (B)',
+                'Total en Relación al PIB (A/B)',
+                'PDSS_Subsidiado en Relación al PIB (A/B)',
+                'PDSS_Contributivo en Relación al PIB (A/B)',
+                'Otros_Planes_de_Salud en Relación al PIB (A/B)'
+            ]
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_SFS_05.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/GastoSalud_PIB.csv'
+    Extraer_FinanciamientoAnual(data_path, header_=9, rows_=23-9, skip=9, columns_="A:J", column_names=names_, archivocsv=datafile)
+    
+    names_ =  [
+                'Año cobertura',    
+                'Total Dispersado SFS',
+                'Régimen Contributivo',
+                'Régimen Subsidiado',
+            ]
+    data_path = "data/SISALRIL/financiamiento/Financiamiento_SFS_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/financiamiento/MontoARS_PBS_Regimen.csv'
+    Extraer_FinanciamientoAnual(data_path, header_=9, rows_=26-9, skip=9, columns_="A:D", column_names=names_, archivocsv=datafile)
+    
+    
+def extraer_prestaciones():
+    """
+    Extrae y normaliza los datos de prestaciones.
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    None
+    """
+    names_ =  [
+            'Ano de Cobertura',
+            'Grupo Numero',
+            'Grupo Descripcion ',
+            'Servicios Prestados',
+            'Distribución Porcentual ',
+        ]
+    data_path = "data/SISALRIL/prestaciones/Prestaciones_RC_PBS_02.xlsx"
+    datafile = 'data/SISALRIL/prestaciones/PrestacionesPBS_Servicios.csv'
+    Extraer_PrestacionesPBS(data_path, header_=7, rows_=231-7, skip=7, columns_="A:E", column_names=names_, archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/prestaciones/Prestaciones_RC_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/prestaciones/PrestacionesPBS_Monto.csv'
+    Extraer_PrestacionesPBS(data_path, header_=6, rows_=230-6, skip=6, columns_="A:E",  archivocsv=datafile)
+
+def extraer_siniestralidad():
+    """
+    Extrae y normaliza los datos de siniestralidad.
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    None
+    """
+    data_path = "data/SISALRIL/siniestralidad/Siniestralidad_RC_PBS_01.xlsx"
+    datafile = 'data/SISALRIL/siniestralidad/RC_Ingresos_Gastos_Siniestralidad.csv'
+    Extraer_SiniestralidadPBS(data_path, header_=9, rows_=204-9, skip=9, columns_="A:D",  archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/siniestralidad/Sinestralidad_OP_01.xlsx"
+    datafile = 'data/SISALRIL/siniestralidad/OP_Ingresos_Gastos_Siniestralidad.csv'
+    Extraer_SiniestralidadPBS(data_path, header_=9, rows_=204-9, skip=9, columns_="A:D",  archivocsv=datafile)
+
+    data_path = "data/SISALRIL/siniestralidad/Siniestralidad_RC_PBS_02.xlsx"
+    datafile = 'data/SISALRIL/siniestralidad/RC_Ingresos_Gastos_Siniestralidad_Anual.csv'
+    Extraer_SiniestralidadFlujos(data_path, header_=10, rows_=23-6, skip=[], columns_="A:E", archivocsv=datafile)
+    
+    data_path = "data/SISALRIL/siniestralidad/Sinestralidad_OP_02.xlsx"
+    datafile = 'data/SISALRIL/siniestralidad/OP_Ingresos_Gastos_Siniestralidad_Anual.csv'
+    Extraer_SiniestralidadFlujos(data_path, header_=14, rows_=31-14, skip=[14,32,50], columns_="A:E", archivocsv=datafile)
+
+    
