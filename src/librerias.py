@@ -48,3 +48,6 @@ from sklearn.preprocessing import OneHotEncoder
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import TomekLinks
 from imblearn.combine import SMOTETomek
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)

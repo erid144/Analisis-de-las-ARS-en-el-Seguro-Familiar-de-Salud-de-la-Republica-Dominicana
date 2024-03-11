@@ -733,7 +733,7 @@ def Extraer_FinanciamientoDispersado_TipoAfiliado(datapath, header_=7, rows_=204
     df = pd.read_excel(datapath, header=None, skiprows=skip, nrows=rows_, usecols=columns_)
     df.columns = column_names
   
-    Normalizar_fecha(df,columna_fecha='Periodo de Cobertura')
+    Normalizar_fecha(df)
     df.to_csv(archivocsv, index=False)
     # return df
     
@@ -989,7 +989,7 @@ def extraer_financiamiento():
     Extraer_FinanciamientoDispersado_TipoAfiliado(data_path, header_=8, rows_=255-9, skip=9, columns_="A:C", column_names=names_, archivocsv=datafile)
     
     names_ =  [
-                'Año',    
+                'Ano de Cobertura',    
                 'Total_Salud (A)',
                 'PDSS_Subsidiado (A)',
                 'PDSS_Contributivo (A)',
@@ -1005,7 +1005,7 @@ def extraer_financiamiento():
     Extraer_FinanciamientoAnual(data_path, header_=9, rows_=23-9, skip=9, columns_="A:J", column_names=names_, archivocsv=datafile)
     
     names_ =  [
-                'Año cobertura',    
+                'Ano de Cobertura',    
                 'Total Dispersado SFS',
                 'Régimen Contributivo',
                 'Régimen Subsidiado',
@@ -1032,7 +1032,7 @@ def extraer_prestaciones():
             'Grupo Numero',
             'Grupo Descripcion ',
             'Servicios Prestados',
-            'Distribución Porcentual ',
+            'Distribucion Porcentual ',
         ]
     data_path = "data/SISALRIL/prestaciones/Prestaciones_RC_PBS_02.xlsx"
     datafile = 'data/SISALRIL/prestaciones/PrestacionesPBS_Servicios.csv'
@@ -1070,4 +1070,32 @@ def extraer_siniestralidad():
     datafile = 'data/SISALRIL/siniestralidad/OP_Ingresos_Gastos_Siniestralidad_Anual.csv'
     Extraer_SiniestralidadFlujos(data_path, header_=14, rows_=31-14, skip=[14,32,50], columns_="A:E", archivocsv=datafile)
 
+    
+def merge_and_save_dataframes(df1, df2, output_file, on_columns, suffixes):
+    # Realizar la unión de los DataFrames en base a columnas y agregar sufijos
+    df_union = pd.merge(df1, df2, on=on_columns, suffixes=suffixes)
+    
+    # Imprimir información sobre el DataFrame resultante
+    print(df_union.info())
+    
+    # Guardar el resultado en un archivo CSV
+    df_union.to_csv(output_file, index=False)
+    
+def merge_and_save_dataframes(dfs, output_file, on_columns, suffixes):
+    # Verificar que haya al menos dos DataFrames para unir
+    if len(dfs) < 2:
+        raise ValueError("Se requieren al menos dos DataFrames para unir.")
+    
+    # Realizar la unión de los DataFrames en base a columnas y agregar sufijos
+    df_union = pd.merge(dfs[0], dfs[1], on=on_columns, suffixes=suffixes)
+    
+    # Unir los DataFrames restantes
+    for df in dfs[2:]:
+        df_union = pd.merge(df_union, df, on=on_columns)
+    
+    # Imprimir información sobre el DataFrame resultante
+    print(df_union.info())
+    
+    # Guardar el resultado en un archivo CSV
+    df_union.to_csv(output_file, index=False)
     
