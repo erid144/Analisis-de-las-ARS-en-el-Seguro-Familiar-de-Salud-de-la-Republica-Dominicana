@@ -62,6 +62,14 @@ def load_dataframes():
   st.session_state.nombres_especificos = Nombres_Especificos
   return dataframes
 
+def generar_grafico(dataframe, tipo_grafico, variables):
+    if tipo_grafico in tipos_graficos:
+        fig = tipos_graficos[tipo_grafico](dataframe, x=variables[0], y=variables[1] if len(variables) > 1 else None)
+        return fig
+    else:
+        raise ValueError("Tipo de gráfico no válido")
+        
+        
 # Cargar Dataframes
 dataframes = load_dataframes()
 # Seleccionar dataframe
@@ -184,10 +192,42 @@ if st.button("Mostrar descripción de las columnas"):
         st.write(column_descriptions[df_name])
     else:
         st.write('No se encontraron descripciones para las columnas de este DataFrame.')
-# Seleccionar features para visualización
-features = st.multiselect('Seleccione features para visualizar', columnas)
+        
+        
+# Definición de tipos de gráficos disponibles
+tipos_graficos = {
+    "Histograma": px.histogram,
+    "Diagrama de dispersión": px.scatter,
+    # Agrega más tipos de gráficos aquí si lo deseas
+}
 
-# Crear gráfico interactivo con Plotly
-if features:
-    fig = px.scatter(df, x=features[0], y=features[1])
+# Inicialización del tipo de gráfico seleccionado
+tipo_grafico_seleccionado = st.selectbox("Seleccione el tipo de gráfico", list(tipos_graficos.keys()))
+dataframe =df
+# Obtener variables del dataframe
+variables = list(dataframe.columns)
+
+# Seleccionar variables para el gráfico
+if tipo_grafico_seleccionado in ["Histograma", "Diagrama de dispersión"]:
+    variable_x = st.selectbox("Seleccione la variable X", variables)
+else:
+    variable_x = st.selectbox("Seleccione la variable X", variables)
+    variable_y = st.selectbox("Seleccione la variable Y", variables)
+
+# Filtrar datos (opcional)
+filtros = {}
+for variable in variables:
+    valor_filtro = st.sidebar.text_input(f"Filtrar por {variable}", "")
+    if valor_filtro != "":
+        filtros[variable] = valor_filtro
+
+# Aplicar filtros al DataFrame
+for variable, valor_filtro in filtros.items():
+    dataframe = dataframe[dataframe[variable] == valor_filtro]
+
+# Generar gráfico
+try:
+    fig = generar_grafico(dataframe, tipo_grafico_seleccionado, [variable_x, variable_y])
     st.plotly_chart(fig)
+except ValueError as e:
+    st.error(str(e))
