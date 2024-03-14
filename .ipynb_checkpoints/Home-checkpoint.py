@@ -5,6 +5,7 @@ sys.path.append('data')
 from librerias import *
 from utils import *
 
+
 st.set_page_config(page_title="Analisis de Datos")
 
 # Ahora puedes agregar el resto de tu código de Streamlit
@@ -22,5 +23,4 @@ st.write("Este proyecto tiene como objetivo realizar un análisis exhaustivo de 
 
 
 
-
-
+st.session_state.dataframes,st.session_state.nombres_especificos,st.session_state.column_descriptions = load_dataframes()

@@ -32,6 +32,11 @@ import plotly.express as px
 import plotly.offline as pyo
 import dash  # Import Dash
 import streamlit as st  # Import Streamlit
+import streamlit_pandas as sp
+from pydantic_settings import BaseSettings
+import pandas_profiling
+from streamlit_pandas_profiling import st_profile_report
+from pydantic_settings import BaseSettings
 #import LazyPredict  # Import Lazy Predict
 
 from sklearn.preprocessing import StandardScaler, LabelEncoder
